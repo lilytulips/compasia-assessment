@@ -21,48 +21,16 @@ class ProcessStatusFileJob implements ShouldQueue
     public function __construct($path)
     {
         $this->path = $path;
-        Log::info("ProcessStatusFileJob constructor", [
-            'path' => $this->path
-        ]);
     }
 
     public function handle()
     {
         try {
-            $fullPath = Storage::path($this->path);
-
-            Log::info("Checking file", [
-                'stored_path' => $this->path,
-                'resolved_full_path' => $fullPath,
-                'storage_disk' => config('filesystems.default'),
-                'disk_root' => config('filesystems.disks.local.root')
-            ]);
-
             if (!Storage::exists($this->path)) {
-                Log::error("File not found in storage: {$this->path}", [
-                    'storage_disk' => config('filesystems.default'),
-                    'expected_path' => $fullPath,
-                    'file_exists_on_fs' => file_exists($fullPath)
-                ]);
                 throw new \Exception("Uploaded file not found in storage: {$this->path}");
             }
 
-            if (!file_exists($fullPath)) {
-                Log::error("File does not exist at filesystem path: {$fullPath}", [
-                    'stored_path' => $this->path,
-                    'storage_path' => storage_path('app'),
-                    'disk_root' => config('filesystems.disks.local.root')
-                ]);
-                throw new \Exception("File does not exist on filesystem: {$fullPath}");
-            }
-
-            Log::info("Processing file", [
-                'path' => $this->path,
-                'full_path' => $fullPath,
-                'file_size' => filesize($fullPath),
-                'file_exists' => file_exists($fullPath),
-                'is_readable' => is_readable($fullPath)
-            ]);
+            $fullPath = Storage::path($this->path);
 
             $import = new StatusImport();
             Excel::import($import, $fullPath);
