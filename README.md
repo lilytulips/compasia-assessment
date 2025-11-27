@@ -5,6 +5,7 @@ Laravel 12 + Vue 3 application for managing product inventory with Excel file up
 ## Features
 
 - Display products with pagination, sorting, and search
+- Real-time search by Product ID (partial matching - filters as you type)
 - Upload Excel files to update product quantities
 - Asynchronous file processing using Laravel queues
 - Auto-create products if they don't exist in database
@@ -91,7 +92,11 @@ Upload `product_status_list.xlsx` with the following columns:
 ## API Endpoints
 
 **GET /api/products**
-- Query params: `product_id`, `per_page`, `sort_by`, `sort_order`
+- Query params: 
+  - `product_id` - Partial match search (e.g., "4" finds all products starting with 4)
+  - `per_page` - Items per page (default: 10)
+  - `sort_by` - Column to sort by (id, product_id, types, brand, model, capacity, quantity)
+  - `sort_order` - Sort direction (asc, desc)
 - Returns paginated product list
 
 **POST /api/products/upload**
