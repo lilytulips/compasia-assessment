@@ -14,7 +14,7 @@ class ProductController extends Controller
         $query = Product::query();
 
         if ($request->filled('product_id')) {
-            $query->where('product_id', $request->product_id);
+            $query->where('product_id', 'like', $request->product_id . '%');
         }
 
         $sortBy = $request->get('sort_by', 'id');

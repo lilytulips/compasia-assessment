@@ -37,7 +37,7 @@
         </svg>
         Upload
       </button>
-    </div>
+      </div>
 
     <!-- Title and Search Section -->
     <div class="mb-6 flex items-center justify-between">
@@ -48,11 +48,11 @@
           @keyup.enter="fetchProducts"
           @input="debounceSearch"
           type="text"
-          placeholder="Search"
+          placeholder="Search Product ID"
           class="px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
         />
       </div>
-    </div>
+      </div>
 
     <!-- Table Section -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -196,21 +196,21 @@
           Next
         </button>
       </div>
+      </div>
     </div>
-  </div>
-</template>
+  </template>
 
-<script>
-import axios from 'axios';
+  <script>
+  import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      products: [],
-      pagination: {},
-      search: '',
-      perPage: 10,
-      file: null,
+  export default {
+    data() {
+      return {
+        products: [],
+        pagination: {},
+        search: '',
+        perPage: 10,
+        file: null,
       fileName: '',
       uploading: false,
       sortColumn: 'id',
@@ -224,20 +224,28 @@ export default {
   mounted() {
     this.fetchProducts();
   },
-  methods: {
-    async fetchProducts(url = null) {
-      try {
-        let params = { per_page: this.perPage };
+    methods: {
+      async fetchProducts(url = null) {
+        try {
+        let res;
+        if (url) {
+          res = await axios.get(url);
+        } else {
+          let params = {
+            per_page: this.perPage,
+            sort_by: this.sortColumn,
+            sort_order: this.sortOrder
+          };
 
-        if (this.search) {
-          params.product_id = this.search;
+          const searchValue = this.search ? String(this.search).trim() : '';
+          if (searchValue) {
+            params.product_id = searchValue;
+          }
+
+          res = await axios.get('/api/products', { params });
         }
 
-        params.sort_by = this.sortColumn;
-        params.sort_order = this.sortOrder;
-
-        const res = await axios.get(url || '/api/products', { params });
-        this.products = res.data.data;
+          this.products = res.data.data;
         this.pagination = {
           current_page: res.data.current_page,
           last_page: res.data.last_page,
@@ -248,19 +256,23 @@ export default {
           next_page_url: res.data.next_page_url,
         };
       } catch (e) {
-        console.error(e);
-        alert('Failed to fetch products');
+        console.error('Error fetching products:', e);
+        if (e.response?.status === 404) {
+          console.error('API endpoint not found. Check if server is running.');
+        }
+        this.products = [];
+        this.pagination = {};
       }
-    },
-    changePage(url) {
-      if (!url) return;
-      this.fetchProducts(url);
-    },
+      },
+      changePage(url) {
+        if (!url) return;
+        this.fetchProducts(url);
+      },
     handleFile(e) {
       this.file = e.target.files[0];
       this.fileName = this.file ? this.file.name : '';
     },
-    async upload() {
+      async upload() {
       if (!this.file) {
         this.showMessage('Please select a file', 'error');
         return;
@@ -268,8 +280,8 @@ export default {
 
       this.uploading = true;
       this.uploadMessage = '';
-      let form = new FormData();
-      form.append('file', this.file);
+        let form = new FormData();
+        form.append('file', this.file);
 
       // Store current quantities for comparison
       const currentQuantities = {};
@@ -331,8 +343,8 @@ export default {
         if (this.$refs.fileInput) {
           this.$refs.fileInput.value = '';
         }
-      } catch (err) {
-        console.error(err);
+        } catch (err) {
+          console.error(err);
         this.showMessage('Upload failed: ' + (err.response?.data?.message || err.message), 'error');
         this.uploading = false;
         if (this.pollingInterval) {
@@ -367,6 +379,9 @@ export default {
     debounceSearch() {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => {
+        if (!this.search || String(this.search).trim() === '') {
+          this.search = '';
+        }
         this.fetchProducts();
       }, 500);
     },
@@ -376,7 +391,7 @@ export default {
     },
   },
 };
-</script>
+  </script>
 
 <style scoped>
 /* Additional custom styles if needed */
