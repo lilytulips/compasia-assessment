@@ -14,7 +14,7 @@ Laravel 12 + Vue 3 application for managing product inventory with Excel file up
 
 - PHP >= 8.2
 - MySQL 5.7+
-- Node.js >= 18.x
+- Node.js >= 20.19 or >= 22.12 (required for Vite 7)
 - Composer
 
 ## Installation
@@ -30,6 +30,8 @@ Laravel 12 + Vue 3 application for managing product inventory with Excel file up
    composer install
    npm install
    ```
+   
+   **Note:** If you use `nvm`, the project includes a `.nvmrc` file. Run `nvm use` to automatically switch to the correct Node.js version.
 
 3. Setup environment
    ```bash
