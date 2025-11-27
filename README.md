@@ -1,59 +1,311 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Product Master List Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel 12 + Vue 3 application for managing product inventory with Excel file upload functionality.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 📊 **Product Master List Display**: View all products with pagination, sorting, and search
+- 📤 **Excel File Upload**: Upload `product_status_list.xlsx` files to update product quantities
+- 🔄 **Queue Processing**: Asynchronous file processing using Laravel queues
+- 🔍 **Search & Filter**: Search products by Product ID
+- 📄 **Backend Pagination**: Efficient server-side pagination
+- 🎨 **Modern UI**: Beautiful, responsive interface built with Vue 3 and Tailwind CSS
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP >= 8.2
+- MySQL 5.7+ or MariaDB 10.3+
+- Node.js >= 18.x
+- Composer
+- Laravel Queue Worker (for processing file uploads)
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd compasia-assessment
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Install Node dependencies**
+   ```bash
+   npm install
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-### Premium Partners
+5. **Configure Database**
+   Edit `.env` file and set your database credentials:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database_name
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+6. **Configure Queue**
+   Set queue connection in `.env`:
+   ```env
+   QUEUE_CONNECTION=database
+   ```
 
-## Contributing
+7. **Run Migrations**
+   ```bash
+   php artisan migrate
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+8. **Seed Database** (Optional - adds sample products)
+   ```bash
+   php artisan db:seed
+   ```
 
-## Code of Conduct
+9. **Build Frontend Assets**
+   ```bash
+   npm run build
+   # Or for development:
+   npm run dev
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Running the Application
 
-## Security Vulnerabilities
+### Development Mode
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. **Start Laravel Server**
+   ```bash
+   php artisan serve
+   ```
+
+2. **Start Queue Worker** (Required for file processing)
+   ```bash
+   php artisan queue:work
+   ```
+   ⚠️ **Important**: Keep this running in a separate terminal. Without it, file uploads won't be processed.
+
+3. **Start Vite Dev Server** (if using `npm run dev`)
+   ```bash
+   npm run dev
+   ```
+
+4. **Access the Application**
+   - Open your browser and navigate to: `http://localhost:8000/products`
+
+### Production Mode
+
+1. **Optimize Application**
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+
+2. **Build Assets**
+   ```bash
+   npm run build
+   ```
+
+3. **Start Queue Worker** (use a process manager like Supervisor in production)
+   ```bash
+   php artisan queue:work --daemon
+   ```
+
+## Excel File Format
+
+The uploaded Excel file (`product_status_list.xlsx`) should have the following structure:
+
+| Product ID | Types      | Brand | Model           | Capacity   | Status |
+|------------|------------|-------|-----------------|------------|--------|
+| 4450       | Smartphone | Apple | iPhone SE       | 2GB/16GB   | Sold   |
+| 6039       | Smartphone | Apple | iPhone SE (2020) | 3GB/64GB   | Buy    |
+
+### Rules:
+- **First row** should contain headers: `Product ID`, `Types`, `Brand`, `Model`, `Capacity`, `Status`
+- **Status** column must contain either `Sold` or `Buy`
+- Each row represents **1 transaction**:
+  - `Sold` = Deduct 1 from quantity
+  - `Buy` = Add 1 to quantity
+- **Product ID** must exist in the database
+
+## API Endpoints
+
+### Get Products List
+```
+GET /api/products
+```
+
+**Query Parameters:**
+- `product_id` (optional): Filter by Product ID
+- `per_page` (optional): Items per page (default: 10)
+- `sort_by` (optional): Column to sort by (id, product_id, types, brand, model, capacity, quantity)
+- `sort_order` (optional): Sort direction (asc, desc)
+
+**Example:**
+```bash
+GET /api/products?product_id=4450&per_page=10&sort_by=product_id&sort_order=asc
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "product_id": 4450,
+      "types": "Smartphone",
+      "brand": "Apple",
+      "model": "iPhone SE",
+      "capacity": "2GB/16GB",
+      "quantity": 13
+    }
+  ],
+  "current_page": 1,
+  "last_page": 1,
+  "per_page": 10,
+  "total": 5
+}
+```
+
+### Upload Status File
+```
+POST /api/products/upload
+```
+
+**Request:**
+- Content-Type: `multipart/form-data`
+- Body: `file` (Excel file: .xlsx or .xls)
+
+**Response:**
+```json
+{
+  "message": "File uploaded. Processing started."
+}
+```
+
+**Status Code:** 202 (Accepted - processing in background)
+
+## Project Structure
+
+```
+compasia-assessment/
+├── app/
+│   ├── Http/
+│   │   └── Controllers/
+│   │       └── Api/
+│   │           └── ProductController.php    # API endpoints
+│   ├── Imports/
+│   │   └── StatusImport.php                 # Excel import logic
+│   ├── Jobs/
+│   │   └── ProcessStatusFileJob.php         # Queue job for file processing
+│   └── Models/
+│       └── Product.php                      # Product model
+├── database/
+│   ├── migrations/
+│   │   └── create_products_table.php        # Products table migration
+│   └── seeders/
+│       └── ProductSeeder.php               # Sample data seeder
+├── resources/
+│   └── js/
+│       └── Pages/
+│           └── ProductsView.vue             # Main Vue component
+└── routes/
+    ├── api.php                              # API routes
+    └── web.php                              # Web routes
+```
+
+## Queue Management
+
+### View Failed Jobs
+```bash
+php artisan queue:failed
+```
+
+### Retry Failed Jobs
+```bash
+php artisan queue:retry {job-id}
+# Or retry all:
+php artisan queue:retry all
+```
+
+### Clear Failed Jobs
+```bash
+php artisan queue:flush
+```
+
+### Restart Queue Worker
+After code changes, restart the queue worker:
+```bash
+# Stop current worker (Ctrl+C)
+# Then restart:
+php artisan queue:work
+```
+
+## Troubleshooting
+
+### File Upload Not Processing
+
+1. **Check if queue worker is running**
+   ```bash
+   # Make sure you have a terminal running:
+   php artisan queue:work
+   ```
+
+2. **Check logs**
+   ```bash
+   tail -f storage/logs/laravel.log
+   ```
+
+3. **Verify file exists**
+   Files are stored in: `storage/app/private/uploads/`
+
+### Quantity Not Updating
+
+1. **Check queue worker logs** - Look for processing errors
+2. **Verify Excel file format** - Must match the required structure
+3. **Check database** - Ensure Product IDs in Excel exist in database
+4. **Review import logs** - Check `storage/logs/laravel.log` for StatusImport messages
+
+### Common Issues
+
+**Issue**: "File does not exist" error
+- **Solution**: Restart queue worker after code changes
+
+**Issue**: Quantities not updating
+- **Solution**: Ensure queue worker is running and check logs for errors
+
+**Issue**: 404 error on API routes
+- **Solution**: Run `php artisan route:clear` and restart server
+
+## Development
+
+### Code Style
+```bash
+# Format PHP code
+./vendor/bin/pint
+```
+
+### Testing
+```bash
+php artisan test
+```
+
+## Technologies Used
+
+- **Backend**: Laravel 12, PHP 8.2+
+- **Frontend**: Vue 3, Inertia.js, Tailwind CSS
+- **Database**: MySQL
+- **Queue**: Laravel Queue (Database driver)
+- **Excel Processing**: Maatwebsite Excel
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
