@@ -1,4 +1,4 @@
-# Product Master List Management System
+# Products Management System
 
 Laravel 12 + Vue 3 application for managing product inventory with Excel file upload functionality.
 
